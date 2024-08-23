@@ -1,0 +1,293 @@
+# Instalação dos pacotes necessários
+install.packages("dygraphs")   # Pacote para criar gráficos interativos
+install.packages('readxl')     # Pacote para leitura de arquivos Excel
+install.packages('openxlsx')   # Pacote para escrita e leitura de arquivos Excel
+
+# Carregamento do pacote dygraphs
+library(dygraphs)
+
+# Leitura dos dados da área de transferência e conversão para série temporal
+serie <- read.table("clipboard")  
+serie <- ts(serie, start = c(2005,1), end = c(2019,12), frequency = 12) # Conversão para série temporal
+serie 
+
+# Criação do diretório 'multv_aditv' se ele não existir
+if(!dir.create('multv_aditv')){
+  dir.create('multv_aditv')
+}
+
+# Escrita da série temporal em um arquivo Excel
+write.xlsx(serie,'multv_aditv/serie.xlsx')
+
+# Criação de um gráfico da série temporal e decomposição
+pdf(file = 'multv_aditv/grafico_modeloMultAdit_pim.pdf', width = 8, height = 6)
+
+# Decomposição aditiva e multiplicativa da série temporal
+decomp.ad = decompose(serie) 
+decomp.mult = decompose(serie, type = "multiplicative")
+
+# Configuração dos parâmetros gráficos
+par(cex.main = 1)  # Tamanho do título principal
+par(cex.lab = 0.5, cex.axis = 0.5)  # Tamanho dos rótulos dos eixos
+
+# Plotagem dos gráficos de decomposição
+plot(decomp.ad)
+plot(decomp.mult)
+
+# Fechamento do dispositivo gráfico PDF
+dev.off()
+
+# Leitura dos dados do arquivo Excel usando readxl
+library(readxl)
+serie <- read_excel('pim.xlsx')  
+serie <- ts(serie, start = c(2005,1), end = c(2019,12), frequency = 12)  
+serie
+
+# Recriação do diretório 'multv_aditv' e escrita da série temporal em Excel
+if(!dir.create('multv_aditv')){
+  dir.create('multv_aditv')
+}
+
+write.xlsx(serie,'multv_aditv/serie.xlsx')
+
+# Criação de gráficos e decomposição
+pdf(file = 'multv_aditv/grafico_modeloMultAdit_pim.pdf', width = 8, height = 6)
+
+decomp.ad = decompose(serie) 
+decomp.mult = decompose(serie, type = "multiplicative")
+
+par(cex.main = 1)
+par(cex.lab = 0.5, cex.axis = 0.5)
+
+plot(decomp.ad)
+plot(decomp.mult)
+
+dev.off()
+
+# Leitura dos dados do arquivo Excel usando openxlsx
+library(openxlsx)
+serie <- read.xlsx('pim.xlsx', sheet = 1) 
+serie <- ts(serie, start = c(2005,1), end = c(2019,12), frequency = 12)  
+serie
+
+# Recriação do diretório 'multv_aditv' e escrita da série temporal em Excel
+if(!dir.create('multv_aditv')){
+  dir.create('multv_aditv')
+}
+
+write.xlsx(serie,'multv_aditv/serie.xlsx')
+
+# Criação de gráficos e decomposição
+pdf(file = 'multv_aditv/grafico_modeloMultAdit_pim.pdf', width = 8, height = 6)
+
+decomp.ad = decompose(serie) 
+decomp.mult = decompose(serie, type = "multiplicative")
+
+par(cex.main = 1)
+par(cex.lab = 0.5, cex.axis = 0.5)
+
+plot(decomp.ad)
+plot(decomp.mult)
+
+dev.off()
+
+# Leitura dos dados e criação de novos diretórios
+library(readxl) 
+library(dplyr)
+
+dados <- read_excel('pim.xlsx') 
+str(dados)  # Estrutura dos dados
+
+# Criação do diretório 'sumario' se ele não existir
+if(!dir.exists('sumario')){
+  dir.create('sumario')
+}
+
+# Criação de uma coluna numérica para o mês
+dados <- dados %>%
+  mutate(Month_num = as.numeric(format(Month, "%Y")) * 12 + as.numeric(format(Month, "%m"))) 
+
+# Ajuste de modelo linear
+model <- lm(Value ~ Month_num, data = dados)  
+
+# Salvamento dos coeficientes, resíduos e resumo do modelo em arquivos CSV e TXT
+coef_df <- as.data.frame(t(model$coefficients))
+write.csv(coef_df, file = "sumario/coeficientes.csv", row.names = FALSE)
+
+resid_df <- as.data.frame(model$residuals)
+write.csv(resid_df, file = "sumario/residuos.csv", row.names = FALSE)
+
+summary_text <- capture.output(summary(model))
+writeLines(summary_text, con = "sumario/resumo_modelo.txt")
+
+# Instalação dos pacotes necessários
+install.packages('readxl')
+install.packages('dplyr')
+install.packages('openxlsx')
+
+# Carregamento dos pacotes e leitura dos dados
+library(readxl) 
+library(dplyr)
+library(openxlsx)
+
+dados <- read_excel("pim.xlsx")
+
+# Criação de uma coluna numérica para o mês
+dados = dados %>%
+  mutate(Month_num = as.numeric(format(Month, '%Y')) * 12 + as.numeric(format(Month, '%m')))
+
+# Ajuste de modelo linear e remoção da tendência
+model <- lm(Value ~ Month_num, data = dados)
+dados = dados %>%
+  mutate(Tendencia = predict(model)) %>%  
+  mutate(Value_detrended = Value - Tendencia)
+
+# Visualização e salvamento dos dados ajustados
+head(dados)
+
+if(!dir.exists('tendencia')){
+  dir.create('tendencia')
+}
+
+write.csv(dados, 'tendencia/pim_sem_tendencia.csv', row.names = FALSE)
+write.xlsx(dados, 'tendencia/pim_sem_tendencia.xlsx')
+
+# Criação de gráficos com e sem tendência
+pdf(file = 'tendencia/grafico-ten.pdf', width = 8, height = 6)
+
+plot(dados$Month, dados$Value,
+     type = 'l',
+     col = 'blue',
+     main = "Série Temporal com e Sem Tendência",
+     xlab = "Mês",
+     ylab = "Valor",
+     ylim = c(min(dados$Value_detrended, na.rm = TRUE), 
+              max(dados$Value, na.rm = TRUE)))
+
+lines(dados$Month, dados$Tendencia,
+      col = 'red')
+
+lines(dados$Month, dados$Value_detrended,
+      col = 'green')
+
+legend('topright',
+       legend = c('Original', 'Tendência', 'Sem Tendência'),
+       col = c('blue', 'red', 'green'),       
+       lty = 1)
+
+dev.off()
+
+# Instalação dos pacotes necessários para a previsão
+install.packages("forecast")
+install.packages("readxl")
+install.packages('openxlsx')
+
+library(forecast)
+library(readxl)
+library(openxlsx)
+
+# Criação do diretório 'amortecomentoExpon' e leitura dos dados
+if(!dir.exists('amortecomentoExpon')){
+  dir.create('amortecomentoExpon')
+}
+dados <- read_excel("pim.xlsx")
+
+# Definição da série temporal e divisão em treino e validação
+serie <- ts(dados, start = c(2000,1), end = c(2019,12), frequency = 12)
+treino <- window(serie, end = c(2018,12))
+write.xlsx(treino,'amortecomentoExpon/treino.xlsx')
+write.csv(treino,'amortecomentoExpon/treino.csv', row.names = FALSE)
+
+validacao <- window(serie, start = c(2019,1))
+write.xlsx(validacao,'amortecomentoExpon/validacao.xlsx')
+write.csv(validacao,'amortecomentoExpon/validacao.csv', row.names = FALSE)
+
+# Ajuste do modelo de suavização exponencial e salvamento dos resultados
+fit <- ses(treino[,2], h = 12, alpha = 0.8)
+write.xlsx(fit,'amortecomentoExpon/fit.xlsx')
+write.csv(fit,'amortecomentoExpon/fit.csv', row.names = FALSE)
+
+# Criação de gráficos para previsões
+pdf(file = 'amortecomentoExpon/graficos_previsão_pim.pdf', width = 8, height = 6)
+
+plot(fit, main='Previsões x Valores Observados nos ultimos 12 meses')
+
+lines(validacao[,2], lty=3)
+
+dev.off()
+
+# Instalação dos pacotes necessários
+install.packages("dygraphs")  
+install.packages('readxl')    
+install.packages('openxlsx') 
+install.packages('ggplot2')
+install.packages('gridExtra')
+
+# Carregamento dos pacotes e leitura dos dados
+library(gridExtra)
+library(openxlsx)
+library(readxl)
+library(dygraphs)
+library(ggplot2)
+library(grid)
+
+dados <- read_excel('pim.xlsx')
+
+# Ordenação e visualização dos dados
+head(dados)
+tail(dados)
+
+dados$Month <- as.Date(dados$Month)
+dados <- dados[order(dados$Month),]
+
+# Conversão para série temporal e decomposição STL
+serie <- ts(dados$Value, start = c(2005,1), end = c(2019,12), frequency = 12)
+serie
+
+decomp_stl <- stl(serie, s.window = "periodic")
+
+# Criação de gráficos e escrita dos resultados em Excel
+plot(decomp_stl)
+
+if(!dir.exists('decomposicao')){
+  dir.create('decomposicao')
+}
+
+df_serie <- data.frame(Month = as.yearmon(time(serie)),
+                       Value = as.numeric(serie))
+df_serie
+
+td_serie <- createWorkbook()
+addWorksheet(td_serie, 'decomp_stl')
+writeDataTable(td_serie, sheet = 'decomp_stl', x = df_serie, 
+               tableStyle = 'TableStyleMedium2')
+saveWorkbook(td_serie, 'decomposicao/td_serie.xlsx', overwrite = TRUE)
+
+df <- data.frame(
+  Date = time(serie),
+  Tendencia = decomp_stl$time.series[,'trend'],
+  Sazonalidade = decomp_stl$time.series[,'seasonal'],
+  Residuos = decomp_stl$time.series[,'remainder']
+)
+
+head(df)
+
+df$Date <- as.yearmon(df$Date)
+
+decomposicao <- createWorkbook()
+addWorksheet(decomposicao, 'decomp_stl')
+writeDataTable(decomposicao, sheet = 'decomp_stl', x = df)
+saveWorkbook(decomposicao, 'decomposicao/decomposicao.xlsx', overwrite = TRUE)
+
+# Criação de gráficos finais
+pdf(file = "decomposicao/graficos_pim.pdf", width = 8, height = 6)
+
+ggplot(dados, aes(x = Month, y = Value)) + 
+  geom_line(color = 'blue') +
+  labs(title = 'Grafico Original da Serie pim',
+       x = 'Mes',
+       y = 'Valor')
+
+plot(decomp_stl, main = 'Decomposição da Serie pim')
+
+dev.off()

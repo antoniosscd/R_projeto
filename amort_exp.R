@@ -1,0 +1,36 @@
+install.packages("forecast")
+install.packages("readxl")
+install.packages('openxlsx')
+
+library(forecast)
+library(readxl)
+library(openxlsx)
+
+if(!dir.exists('amortecomentoExpon'))
+dados <- read_excel("pim.xlsx")
+
+if(!dir.exists('amortecomentoExpon')){
+  dir.create('amortecomentoExpon')
+}
+
+serie <- ts(dados, start = c(2000,1), end = c(2019,12), frequency = 12)
+
+treino <- window(serie, end = c(2018,12))
+write.xlsx(treino,'amortecomentoExpon/treino.xlsx')
+write.csv(treino,'amortecomentoExpon/treino.csv', row.names = FALSE)
+
+validacao <- window(serie, start = c(2019,1))
+write.xlsx(validacao,'amortecomentoExpon/validacao.xlsx')
+write.csv(validacao,'amortecomentoExpon/validacao.csv', row.names = FALSE)
+fit <- ses(treino[,2], h = 12, alpha = 0.8)
+write.xlsx(fit,'amortecomentoExpon/fit.xlsx')
+write.csv(fit,'amortecomentoExpon/fit.csv', row.names = FALSE)
+
+
+pdf(file = 'amortecomentoExpon/graficos_previsão_pim.pdf', width = 8, height = 6)
+
+plot(fit, main='Previsões x Valores Observados nos ultimos 12 meses')
+
+lines(validacao[,2], lty=3)
+
+dev.off()

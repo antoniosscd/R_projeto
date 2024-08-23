@@ -1,0 +1,15 @@
+df <- data.frame(
+  Date = time(serie),
+  Tendencia = decomp_stl$time.series[,'trend'],
+  Sazonalidade <- decomp_stl$time.series[,'seasonal'],
+  residuos <- decomp_stl$time.series[,'remainder']
+  )
+
+head(df)
+
+df$Date <- as.yearmon(df$Date)
+decomposicao <- createWorkbook()
+addWorksheet(decomposicao, 'decomp_stl')
+writeDataTable(decomposicao, sheet = 'decomp_stl',x = df, 
+               tableStyle = 'TableStyleMedium2')
+saveWorkbook(decomposicao, 'decomposicao/decomposicao.xlsx', overwrite = TRUE)
