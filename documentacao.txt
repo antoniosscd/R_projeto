@@ -341,3 +341,4 @@ Uma string que representa a versão completa do R, incluindo a data de lançamen
 
 nickname: Puppy Cup
 O apelido dado à versão específica do R.
+.
