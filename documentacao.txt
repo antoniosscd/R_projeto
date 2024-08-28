@@ -291,3 +291,53 @@ ggplot(dados, aes(x = Month, y = Value)) +
 plot(decomp_stl, main = 'Decomposição da Serie pim')
 
 dev.off()
+
+
+
+
+Informações da Versão do R
+
+platform: x86_64-w64-mingw32
+Plataforma e arquitetura do sistema operacional para a qual o R foi compilado. Neste caso, x86_64 é uma arquitetura de 64 bits, e mingw32 refere-se a um ambiente de desenvolvimento para Windows.
+
+arch: x86_64
+Arquitetura do processador. x86_64 refere-se a uma arquitetura de 64 bits.
+
+os: mingw32
+O sistema operacional uma versão do Windows, mais presisamente Microsoft Windows [versão 10.0.19045.4780].
+
+crt: ucrt
+O runtime C utilizado. ucrt refere-se ao Universal C Runtime, que faz parte das bibliotecas padrão do Windows.
+
+system: x86_64, mingw32
+Informação combinada da arquitetura e do sistema operacional.
+
+status:
+vazio
+
+major: 4
+Versão principal do R.
+
+minor: 4.0
+Versão secundária do R. Junto com o major, indica a versão exata do R.
+
+year: 2024
+O ano de lançamento da versão do R.
+
+month: 04
+O mês de lançamento da versão do R.
+
+day: 24
+O dia de lançamento da versão do R.
+
+svn rev: 86474
+O número de revisão do SVN (subversion) do código-fonte do R usado para essa versão.
+
+language: R
+A linguagem usada, que é R.
+
+version.string: R version 4.4.0 (2024-04-24 ucrt)
+Uma string que representa a versão completa do R, incluindo a data de lançamento e o tipo de runtime C.
+
+nickname: Puppy Cup
+O apelido dado à versão específica do R.
