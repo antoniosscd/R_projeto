@@ -6,7 +6,7 @@ library(forecast)
 library(readxl)
 library(openxlsx)
 
-if(!dir.exists('amortecomentoExpon'))
+
 dados <- read_excel("pim.xlsx")
 
 dados$Month <- as.Date(dados$Month)
@@ -25,10 +25,11 @@ write.csv(treino,'amortecomentoExpon/treino.csv', row.names = FALSE)
 validacao <- window(serie, start = c(2019,1))
 write.xlsx(validacao,'amortecomentoExpon/validacao.xlsx')
 write.csv(validacao,'amortecomentoExpon/validacao.csv', row.names = FALSE)
-fit <- ses(treino[,2], h = 12, alpha = 0.8)
+fit <- ses(treino[,2], h = 12, alpha = 0.8269)
 write.xlsx(fit,'amortecomentoExpon/fit.xlsx')
 write.csv(fit,'amortecomentoExpon/fit.csv', row.names = FALSE)
 
+summary(fit)
 
 pdf(file = 'amortecomentoExpon/graficos_previsão_pim.pdf', width = 8, height = 6)
 
@@ -40,14 +41,9 @@ dev.off()
 
 
 
-fit <- ses(treino[,2], h = 12)
-
-fit3 <- summary(fit)
-
-
 # 
 # ''''
-# Vamos analisar o relatório gerado pelo modelo de suavização exponencial simples (Simple exponential smoothing), que é utilizado para prever valores futuros com base em uma série temporal univariada.
+# Analise do relatório gerado pelo modelo de suavização exponencial simples (Simple exponential smoothing) para série temporal univariada.
 # 
 # 1. Método de Previsão
 # Forecast method: Simple exponential smoothing (Suavização exponencial simples).
